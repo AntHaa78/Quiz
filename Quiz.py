@@ -2,6 +2,13 @@ import requests
 import pandas as pd
 import json
 import random
+import os
+
+
+#load api key from env file
+from dotenv import load_dotenv
+load_dotenv()
+api_key = os.getenv('api_key')
 
 #read csv file with datas
 df=pd.read_csv('vocab quiz.csv')
@@ -45,7 +52,7 @@ response=requests.post("https://google-translate1.p.rapidapi.com/language/transl
     headers={
     'content-type': 'application/x-www-form-urlencoded',
     "Accept-Encoding": "application/gzip",
-    'X-RapidAPI-Key': 'c862fff557msh04e472cb4e3799fp17d4b0jsn23ace425136a',
+    'X-RapidAPI-Key': api_key,
     'X-RapidAPI-Host': 'google-translate1.p.rapidapi.com'
   }
 )
