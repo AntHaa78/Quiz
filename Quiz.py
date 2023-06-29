@@ -45,7 +45,7 @@ else:
     vocab_chosen_translated = en_translate(vocab_chosen_cleaned)
 
 
-#Create dict of words and translated words (easy to shuffle together for quiz)
+#Create dict of words and translated words (questions/correct answer, easy to shuffle together for quiz)
 result=dict(zip(vocab_chosen_cleaned, vocab_chosen_translated))
 
 #Set questions asked to 5 and randomize which words are taken
