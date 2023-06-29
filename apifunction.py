@@ -19,7 +19,7 @@ def en_translate(words):
     )
     result=response.json()
     vocab_chosen_translated=[d['translatedText'] for d in (result['data'])['translations']]
-    print(vocab_chosen_translated)
+    return vocab_chosen_translated
 
 def fi_translate(sanat):
     from dotenv import load_dotenv
@@ -36,10 +36,9 @@ def fi_translate(sanat):
         }
     )
     result=response.json()
-    #vocab_chosen_translated=[d['translatedText'] for d in (result['data'])['translations']]
-    #return vocab_chosen_translated
-    return  [d['translatedText'] for d in (result['data'])['translations']]
-    #print(vocab_chosen_translated)
+    vocab_chosen_translated=[d['translatedText'] for d in (result['data'])['translations']]
+    return vocab_chosen_translated
+
 
 
 

@@ -36,29 +36,14 @@ vocab_chosen_cleaned=[x for x in vocab_chosen if str(x) != 'nan']
 
 
 
-#Configure my data (source/target language) then call the google translate api
+#Use the translate function depending on fin/eng list chosen
 if category_chosen in category_fi:
     fi_translate(vocab_chosen_cleaned)
-else: en_translate(vocab_chosen_cleaned)
+    vocab_chosen_translated=fi_translate(vocab_chosen_cleaned)
+else:
+    en_translate(vocab_chosen_cleaned)
+    vocab_chosen_translated = en_translate(vocab_chosen_cleaned)
 
-
-"""#load api key from env file
-from dotenv import load_dotenv
-load_dotenv()
-api_key = os.getenv('api_key')
-
-response=requests.post("https://google-translate1.p.rapidapi.com/language/translate/v2",
-    data = mydata,
-    headers={
-    'content-type': 'application/x-www-form-urlencoded',
-    "Accept-Encoding": "application/gzip",
-    'X-RapidAPI-Key': api_key,
-    'X-RapidAPI-Host': 'google-translate1.p.rapidapi.com'
-  }
-)
-
-result=response.json()
-vocab_chosen_translated=[d['translatedText'] for d in (result['data'])['translations']]"""
 
 #Create dict of words and translated words (easy to shuffle together for quiz)
 result=dict(zip(vocab_chosen_cleaned, vocab_chosen_translated))
