@@ -3,12 +3,7 @@ import pandas as pd
 import json
 import random
 import os
-
-
-#load api key from env file
-from dotenv import load_dotenv
-load_dotenv()
-api_key = os.getenv('api_key')
+from apifunction import *
 
 #read csv file with datas
 df=pd.read_csv('vocab quiz.csv')
@@ -18,7 +13,7 @@ categories=[]
 for row in df:
     categories.append(row)
 
-#Define if vocab will be fin or eng, useful for api call translate (source/target)
+#Define if vocab will be fin or eng, useful for api call translate source/target (0 2 4 columns = fin)
 category_fi=categories[::2]
 
 #Ask user what category, loop if answer incorrect (not one of the categories)
@@ -43,9 +38,14 @@ vocab_chosen_cleaned=[x for x in vocab_chosen if str(x) != 'nan']
 
 #Configure my data (source/target language) then call the google translate api
 if category_chosen in category_fi:
-     mydata={'source':'fi', 'target':'en', 'q':vocab_chosen_cleaned}
-else:
-     mydata={'source':'en', 'target':'fi', 'q':vocab_chosen_cleaned}
+    fi_translate(vocab_chosen_cleaned)
+else: en_translate(vocab_chosen_cleaned)
+
+
+"""#load api key from env file
+from dotenv import load_dotenv
+load_dotenv()
+api_key = os.getenv('api_key')
 
 response=requests.post("https://google-translate1.p.rapidapi.com/language/translate/v2",
     data = mydata,
@@ -58,7 +58,7 @@ response=requests.post("https://google-translate1.p.rapidapi.com/language/transl
 )
 
 result=response.json()
-vocab_chosen_translated=[d['translatedText'] for d in (result['data'])['translations']]
+vocab_chosen_translated=[d['translatedText'] for d in (result['data'])['translations']]"""
 
 #Create dict of words and translated words (easy to shuffle together for quiz)
 result=dict(zip(vocab_chosen_cleaned, vocab_chosen_translated))
