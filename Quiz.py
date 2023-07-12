@@ -1,8 +1,5 @@
-import requests
 import pandas as pd
-import json
 import random
-import os
 from apifunction import *
 
 #read csv file with datas
@@ -30,13 +27,12 @@ while True:
 
 #Create the vocabulary list according to category chosen
 vocab_chosen=df[category_chosen].tolist()
+
 #Remove the nan from the empty csv cells
 vocab_chosen_cleaned=[x for x in vocab_chosen if str(x) != 'nan']
 
 
-
-
-#Use the translate function depending on fin/eng list chosen
+#Use the translate function (api call) depending on fin/eng list chosen
 if category_chosen in category_fi:
     fi_translate(vocab_chosen_cleaned)
     vocab_chosen_translated=fi_translate(vocab_chosen_cleaned)
@@ -62,4 +58,3 @@ for num, (question, correct_answer) in enumerate(questions, start=1):
         print(f" No the answer was {correct_answer!r}!")
     
 print(f"\n Your score is {num_correct} out of {num}! ")
-
