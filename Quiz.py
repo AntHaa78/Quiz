@@ -1,48 +1,62 @@
-import pandas as pd
 import random
 from apifunction import *
+from bs4 import BeautifulSoup
 
-#read csv file with datas
-df=pd.read_csv('vocab quiz.csv')
+#First url to get the categories, read the html
+url="https://uusikielemme.fi/finnish-vocabulary"
+response=requests.get(url)
+soup = BeautifulSoup(response.text, 'html.parser')
+links_html = soup.find_all('a')
 
 #Create categories-list
-categories=[]
-for row in df:
-    categories.append(row)
+categories = [t.text for t in links_html]
+beginner_category=categories[categories.index('Finnish loanwords'):categories.index('Liquid foods')+1]
+intermediate_category=categories[categories.index('List of hobbies'):categories.index('100 random nouns')+1]
+advanced_category=categories[categories.index('Government and politics'):categories.index('Adjectives with fixed modifiers')+1]
 
-#Define if vocab will be fin or eng, useful for api call translate source/target (0 2 4 columns = fin)
-category_fi=categories[::2]
+
 
 #Ask user what category, loop if answer incorrect (not one of the categories)
 while True:
-
-    category_chosen=input(f"Choose a category: {categories}: ")
-    if  category_chosen not in categories:
-        print("\n Please choose among the proposed categories (don't forget upper letter)")
+    difficulty = input("Choose a level: beginner    intermediate    advanced: ")
+    if difficulty == "beginner":
+        print("Categories: ")
+        print("\n".join([" | ".join(beginner_category[i:i+10]) for i in range(0,len(beginner_category),10)]))
+        category=input(f"\n Whats is your selected category: ")
+        break
+    elif difficulty == "intermediate":
+        print("\n".join([" | ".join(intermediate_category[i:i + 10]) for i in range(0, len(intermediate_category), 10)]))
+        category = input(f"\n Whats is your selected category: ")
+        break
+    elif difficulty == "advanced":
+        print("\n".join([" | ".join(advanced_category[i:i + 10]) for i in range(0, len(advanced_category), 10)]))
+        category = input(f"\n Whats is your selected category: ")
+        break
+    else:
+        print("Please select only among the 3 levels")
         continue
-    else: 
-        print(f"\n You've chosen {category_chosen!r}! Let the quiz begin \n")
+
+while True:
+    if category not in categories:
+        category=input("\nIt seems you did not type the category correctly, please rectify: ")
+        continue
+    else:
+        print(f"\nYou selected {category}!")
         break
 
+# Access to second URL (depengind on answer before) where actual finnish and english words are listed in rows
+link=soup.find('a', string=category)
+url2=link['href']
+response2=requests.get(url2)
+soup2 = BeautifulSoup(response2.text, 'html.parser')
+rows_html = soup2.find_all('td')
 
-#Create the vocabulary list according to category chosen
-vocab_chosen=df[category_chosen].tolist()
-
-#Remove the nan from the empty csv cells
-vocab_chosen_cleaned=[x for x in vocab_chosen if str(x) != 'nan']
-
-
-#Use the translate function (api call) depending on fin/eng list chosen
-if category_chosen in category_fi:
-    fi_translate(vocab_chosen_cleaned)
-    vocab_chosen_translated=fi_translate(vocab_chosen_cleaned)
-else:
-    en_translate(vocab_chosen_cleaned)
-    vocab_chosen_translated = en_translate(vocab_chosen_cleaned)
-
+#Define two list for finnish/english words
+finnish_words=[t.text for t in rows_html[::2]]
+english_words=[t.text for t in rows_html[1::2]]
 
 #Create dict of words and translated words (questions/correct answer, easy to shuffle together for quiz)
-result=dict(zip(vocab_chosen_cleaned, vocab_chosen_translated))
+result=dict(zip(finnish_words, english_words))
 
 #Set questions asked to 5 and randomize which words are taken
 questions=random.sample(list(result.items()), k=5)
