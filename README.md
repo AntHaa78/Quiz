@@ -1,6 +1,3 @@
 # Quiz
 
-Fin/Eng translation quiz, with option to select vocabulary categories from csv file (Värit/Colors	Kuukaudet/Months	Eläimet/Animals), with call to google translator API to provide the answer.
-
-
-P.s: api calls quota full 28.06
+We scrap the website uusikielemme to directly import the vocabulary lists wanted (much more choice since not limited by api calls) then proceed to the quiz.
