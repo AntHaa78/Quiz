@@ -1,6 +1,6 @@
 # Quiz
 
-When learning languages it can be both smart and fun to sometimes focus on precise area of vocabulary, so here is a program to answer this need.
+When learning languages it can be both smart and fun to sometimes focus on precise areas of vocabulary, so here is a program to answer this need.
 
 
 Two ways of playing a Fin/Eng translation quiz.
