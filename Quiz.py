@@ -1,5 +1,5 @@
 import random
-from apifunction import *
+import requests
 from bs4 import BeautifulSoup
 
 #First url to get the categories, read the html
