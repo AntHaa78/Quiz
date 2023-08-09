@@ -44,7 +44,7 @@ while True:
         print(f"\nYou selected {category}!")
         break
 
-# Access to second URL (depengind on answer before) where actual finnish and english words are listed in rows
+# Access to second URL (depending on answer before) where actual finnish and english words are listed in rows
 link=soup.find('a', string=category)
 url2=link['href']
 response2=requests.get(url2)
@@ -55,8 +55,15 @@ rows_html = soup2.find_all('td')
 finnish_words=[t.text for t in rows_html[::2]]
 english_words=[t.text for t in rows_html[1::2]]
 
+# Remove elements that have more than one whitespace in the finnish_words list(often are whole sentences) and the
+# corresponding element in the english word list - Example Fruit category in beginner
+new_finnish_words=[i for i in finnish_words if not i.count(' ') > 1]
+new_english_words=[j for i,j in zip(finnish_words,english_words) if not i.count(' ') > 1]
+
+
 #Create dict of words and translated words (questions/correct answer, easy to shuffle together for quiz)
-result=dict(zip(finnish_words, english_words))
+result=dict(zip(new_finnish_words, new_english_words))
+
 
 #Set questions asked to 5 and randomize which words are taken
 questions=random.sample(list(result.items()), k=5)
@@ -72,3 +79,4 @@ for num, (question, correct_answer) in enumerate(questions, start=1):
         print(f" No the answer was {correct_answer!r}!")
     
 print(f"\n Your score is {num_correct} out of {num}! ")
+
