@@ -1,63 +1,71 @@
+import requests
 from tkinter import *
+import random
+from bs4 import BeautifulSoup
 
+class Quiz:
 
-result = {'käsi': 'hand', 'hammas':'tooth', 'hiukset':'hair'}
+    def __init__(self):
+        self.question_no=0
+        self.display_title()
+        self.display_question()
+        self.answer=self.entry_answers()
+        self.buttons()
+        self.data_size=len(question)
+        self.correct=0
 
-user_answer_list = []
-correct_answer_list = list(result.values())
+    def display_result(self):
+        score = f'You have {self.correct}/{self.data_size} correct answers!'
+        mb.showinfo("Result", f'{score}')
 
-def questions(num):
-    word_to_translate = list(result.keys())[num-1]
-    question = f'What is the translation of {word_to_translate}?: '
-    return question
+    def check_ans(self, question_no):
+        if self.answer.get() == answer[question_no]:
+            return True
 
-def check_answers():
-    answer1 = answer1_field.get()
-    answer2 = answer2_field.get()
-    answer3 = answer3_field.get()
-    user_answer_list = [answer1, answer2, answer3]
-    number_correct_answers = len(set(user_answer_list) & set(correct_answer_list))
-    res = (f'You have {number_correct_answers} correct answers!')
-    button1.config(text=res)
+    def choose_difficulty(self):
+        if difficulty_field.get():
+            url = "https://uusikielemme.fi/finnish-vocabulary"
+            response = requests.get(url)
+            global soup
+            soup = BeautifulSoup(response.text, 'html.parser')
+            links_html = soup.find_all('a')  # <a> are hyperlinks in html
 
+            # Create difficulty categories-list
+            categories = [t.text for t in links_html]
+            beginner_category = categories[categories.index('Finnish loanwords'):categories.index('Liquid foods') + 1]
+            intermediate_category = categories[
+                                    categories.index('List of hobbies'):categories.index('100 random nouns') + 1]
+            advanced_category = categories[categories.index('Government and politics'):categories.index(
+                'Adjectives with fixed modifiers') + 1]
+            difficulty = difficulty_field.get()
+            if difficulty == 'beginner':
+                categories_str = "\n".join(
+                    [" | ".join(beginner_category[i:i + 10]) for i in range(0, len(beginner_category), 10)])
+            elif difficulty == 'intermediate':
+                categories_str = "\n".join(
+                    [" | ".join(intermediate_category[i:i + 10]) for i in range(0, len(intermediate_category), 10)])
+            elif difficulty == 'advanced':
+                categories_str = "\n".join(
+                    [" | ".join(advanced_category[i:i + 10]) for i in range(0, len(advanced_category), 10)])
+            else:
+                return 'Not a valid category'
 
-def clear_all():
-    answer1_field.delete(0, END)
-    answer2_field.delete(0, END)
-    answer3_field.delete(0, END)
+    def choose_category(self):
+        if category_field.get():
+            category=category_field.get()
+            # Access to second URL (depending on answer before) where actual finnish and english words are listed in rows
+            link = soup.find('a', string=category)
+            url2 = link['href']
+            response2 = requests.get(url2)
+            soup2 = BeautifulSoup(response2.text, 'html.parser')
+            rows_html = soup2.find_all('td')
 
-if __name__ == "__main__" :
+            # Define two list for finnish/english words
+            finnish_words = [t.text for t in rows_html[::2]]
+            english_words = [t.text for t in rows_html[1::2]]
 
-    root = Tk()
-
-    root.title('Translation Quiz')
-    root.geometry('450x300')
-
-    label1 = Label(root, text= questions(1), fg='black', bg='white')
-    label2 = Label(root, text= questions(2), fg='black', bg='white')
-    label3 = Label(root, text= questions(3), fg='black', bg='white')
-
-
-    label1.grid(row=1, column=0, padx = 10, pady = 10)
-    label2.grid(row=2, column=0, padx=10, pady=10)
-    label3.grid(row=3, column=0, padx=10, pady=10)
-
-    answer1_field=Entry(root)
-    answer2_field=Entry(root)
-    answer3_field=Entry(root)
-
-    answer1_field.grid(row=1, column=1, padx=10, pady=10)
-    answer2_field.grid(row=2, column=1, padx=10, pady=10)
-    answer3_field.grid(row=3, column=1, padx=10, pady=10)
-
-
-
-
-
-    # Create check, reset button and display score
-    button1= Button(root, text='Submit answers and display score', bg='red', fg='black', command=check_answers)
-    button1.grid(row=4, column=0, pady=10)
-    button2= Button(root, text='Clear all', bg='red', fg='black', command=clear_all)
-    button2.grid(row=5, column=1, pady=10)
-
-    root.mainloop()
+            # Create dict of words and translated words (questions/correct answer, easy to shuffle together for quiz)
+            global resultat
+            resultat = dict(zip(finnish_words, english_words))
+            global correct_answer_list
+            correct_answer_list = list(resultat.values())
