@@ -75,6 +75,10 @@ for num, (question, correct_answer) in enumerate(questions, start=1):
     if answer==correct_answer:
         num_correct+=1
         print('\n ⭐ Correct! ⭐')
+    # Sometimes 2 translations are given, so far always separated by a comma or slash
+    elif answer in correct_answer and ('/' in correct_answer or ',' in correct_answer):
+        num_correct+=1
+        print('\n ⭐ Correct! ⭐')
     else:
         print(f" No the answer was {correct_answer!r}!")
     
