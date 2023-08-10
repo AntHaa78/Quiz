@@ -9,5 +9,7 @@ In the master branch, few vocabulary categories are stored in a csv file. The pr
 
 In the scrap branch, we scrap the website uusikielemme to directly import the vocabulary lists wanted (much more choice since not limited by api calls)
 
+In the GUI branch, we develop a GUI version of the scrap-version quiz. Work in progress
+
 
 P.s: api calls quota full 28.06
