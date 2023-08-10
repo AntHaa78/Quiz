@@ -9,7 +9,7 @@ correct_answer_list = list(result.values())
 
 
 def questions(num):
-    return f'What is the transltaion of {word_to_translate[num - 1]}?'
+    return f'What is the translation of {word_to_translate[num - 1]}?'
 
 
 def check_answers():

@@ -1,6 +1,5 @@
 import random
 from bs4 import BeautifulSoup
-from tkinter import *
 import requests
 
 
