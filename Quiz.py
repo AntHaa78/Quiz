@@ -34,6 +34,7 @@ while True:
         break
     else:
         print("Please select only among the 3 levels")
+        category = ''
         continue
 
 while True:
