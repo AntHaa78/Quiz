@@ -1,13 +1,7 @@
-# Quiz
+# QuizGUI
 
-When learning languages it can be both smart and fun to sometimes focus on precise areas of vocabulary, so here is a program to answer this need.
+Branch for the development of GUI version of the quiz using tkinter (scrap version)
 
-
-Two ways of playing a Fin/Eng translation quiz.
-
-In the master branch, few vocabulary categories are stored in a csv file. The program imports the vocabulary lists and then use google translator (API) to provide the translated answer.
-
-In the scrap branch, we scrap the website uusikielemme to directly import the vocabulary lists wanted (much more choice since not limited by api calls)
+Work in progress, basicQuizGUI working. 
 
 
-P.s: api calls quota full 28.06
