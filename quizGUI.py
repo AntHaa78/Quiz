@@ -1,71 +1,186 @@
-import requests
-from tkinter import *
+import pandas as pd
 import random
-from bs4 import BeautifulSoup
+from tkinter import *
 
-class Quiz:
+# read csv file with datas
+df = pd.read_csv('Vocab chapters.csv')
 
-    def __init__(self):
-        self.question_no=0
-        self.display_title()
-        self.display_question()
-        self.answer=self.entry_answers()
-        self.buttons()
-        self.data_size=len(question)
-        self.correct=0
+# Create categories-list
+categories = []
+for row in df:
+    categories.append(row)
 
-    def display_result(self):
-        score = f'You have {self.correct}/{self.data_size} correct answers!'
-        mb.showinfo("Result", f'{score}')
+# Define if vocab will be fin or eng, useful for selecting other (translated) column
+category_fi = categories[::2]
+category_en = categories[1::2]
 
-    def check_ans(self, question_no):
-        if self.answer.get() == answer[question_no]:
-            return True
 
-    def choose_difficulty(self):
-        if difficulty_field.get():
-            url = "https://uusikielemme.fi/finnish-vocabulary"
-            response = requests.get(url)
-            global soup
-            soup = BeautifulSoup(response.text, 'html.parser')
-            links_html = soup.find_all('a')  # <a> are hyperlinks in html
 
-            # Create difficulty categories-list
-            categories = [t.text for t in links_html]
-            beginner_category = categories[categories.index('Finnish loanwords'):categories.index('Liquid foods') + 1]
-            intermediate_category = categories[
-                                    categories.index('List of hobbies'):categories.index('100 random nouns') + 1]
-            advanced_category = categories[categories.index('Government and politics'):categories.index(
-                'Adjectives with fixed modifiers') + 1]
-            difficulty = difficulty_field.get()
-            if difficulty == 'beginner':
-                categories_str = "\n".join(
-                    [" | ".join(beginner_category[i:i + 10]) for i in range(0, len(beginner_category), 10)])
-            elif difficulty == 'intermediate':
-                categories_str = "\n".join(
-                    [" | ".join(intermediate_category[i:i + 10]) for i in range(0, len(intermediate_category), 10)])
-            elif difficulty == 'advanced':
-                categories_str = "\n".join(
-                    [" | ".join(advanced_category[i:i + 10]) for i in range(0, len(advanced_category), 10)])
-            else:
-                return 'Not a valid category'
+def define_vocab_list():
+    category_chosen = user_category_field.get()
+    category_chosen = category_chosen.title()
+    if category_chosen in categories:
+        text = f"You've selected {category_chosen}! Let the quiz begin"
+        button_confirm_category.config(text=text)
 
-    def choose_category(self):
-        if category_field.get():
-            category=category_field.get()
-            # Access to second URL (depending on answer before) where actual finnish and english words are listed in rows
-            link = soup.find('a', string=category)
-            url2 = link['href']
-            response2 = requests.get(url2)
-            soup2 = BeautifulSoup(response2.text, 'html.parser')
-            rows_html = soup2.find_all('td')
+        if category_chosen in category_fi:
+            vocab_chosen = df[category_chosen].tolist()
+            category_chosen_translated = category_chosen.replace('Fi', 'En')
+            vocab_chosen_translated = df[category_chosen_translated].tolist()
+            # Remove possible nan from the empty csv cells
+            vocab_chosen_cleaned = [x for x in vocab_chosen if str(x) != 'nan']
+            vocab_chosen_translated_cleaned = [x for x in vocab_chosen_translated if str(x) != 'nan']
 
-            # Define two list for finnish/english words
-            finnish_words = [t.text for t in rows_html[::2]]
-            english_words = [t.text for t in rows_html[1::2]]
+        if category_chosen in category_en:
+            vocab_chosen = df[category_chosen].tolist()
+            category_chosen_translated = category_chosen.replace('En', 'Fi')
+            vocab_chosen_translated = df[category_chosen_translated].tolist()
+            # Remove possible nan from the empty csv cells
+            vocab_chosen_cleaned = [x for x in vocab_chosen if str(x) != 'nan']
+            vocab_chosen_translated_cleaned = [x for x in vocab_chosen_translated if str(x) != 'nan']
 
-            # Create dict of words and translated words (questions/correct answer, easy to shuffle together for quiz)
-            global resultat
-            resultat = dict(zip(finnish_words, english_words))
-            global correct_answer_list
-            correct_answer_list = list(resultat.values())
+        # Create dict of words and translated words (questions/correct answer, easy to shuffle together for quiz)
+        result = dict(zip(vocab_chosen_cleaned, vocab_chosen_translated_cleaned))
+        result = random.sample(list(result.items()), k=len(result))
+        questions = []
+        global correct_answers
+        correct_answers = []
+        for question, correct_answer in result:
+            questions.append(question)
+            correct_answers.append(correct_answer)
+
+        question_text = 'What is the translation of: '
+        label_question1.config(text=question_text + questions[0])
+        label_question2.config(text=question_text + questions[1])
+        label_question3.config(text=question_text + questions[2])
+        label_question4.config(text=question_text + questions[3])
+        label_question5.config(text=question_text + questions[4])
+    else:
+        text = 'Please choose among the selected categories only!'
+        button_confirm_category.config(text=text)
+        root.after(4000, lambda: root.destroy())
+
+
+def check_answers():
+    answers = [answer1_field.get(), answer2_field.get(), answer3_field.get(), answer4_field.get(), answer5_field.get()]
+    num_correct = 0
+    for answer, correct_answer in zip(answers, correct_answers):
+        if answer == correct_answer or answer.lower() == correct_answer or answer.title() == correct_answer:
+            num_correct += 1
+        elif answer in correct_answer and (',' in correct_answer):
+            num_correct += 1
+        else:
+            pass
+    button_check_answers.config(text='Your score is ' + str(num_correct) + '/5!')
+
+def show_correct_answers():
+    text = f'The correct answers are:\nQuestion1: {correct_answers[0]} | Question2: {correct_answers[1]}  \n' \
+           f'Question3: {correct_answers[2]} | Question4: {correct_answers[3]} \n Question5: {correct_answers[4]} '
+    button_show_correct_answers.config(text=text)
+
+
+def clear_all():
+    user_category_field.delete(0, END)
+    button_confirm_category.config(text='Please select a category')
+    button_check_answers.config(text='Check answers')
+    button_show_correct_answers.config(text='Show all correct answers')
+    answer1_field.delete(0, END)
+    answer2_field.delete(0, END)
+    answer3_field.delete(0, END)
+    answer4_field.delete(0, END)
+    answer5_field.delete(0, END)
+    label_question1.config(text='Waiting for category...')
+    label_question2.config(text='Waiting for category...')
+    label_question3.config(text='Waiting for category...')
+    label_question4.config(text='Waiting for category...')
+    label_question5.config(text='Waiting for category...')
+
+
+
+
+# Create a GUI Window
+root = Tk()
+
+# set the size of the GUI Window
+root.geometry("1500x600")
+
+# set the title of the Window
+root.title("Quiz")
+
+str_categories='CATEGORIES: ' + ' | '.join(categories)
+label_categories = Label(root, text=str_categories, fg='red')
+label_categories.grid(row=1, column=1, padx=10, pady=10)
+
+
+label_user_category = Label(root, text='Please choose a chapter among the ones proposed above: ', fg='black')
+label_user_category.grid(row=2, column=0, padx=10, pady= 10)
+
+user_category_field = Entry(root)
+user_category_field.grid(row=2, column=2, padx=10, pady=10)
+
+button_confirm_category = Button(root, text='Confirm category', bg='red', fg='black', command=define_vocab_list)
+button_confirm_category.grid(row=3, column=1, padx=10, pady=10 )
+
+label_question1 = Label(root, text= 'Waiting for category...')
+label_question1.grid(row=4, column=0, pady=10)
+
+label_question2 = Label(root, text= 'Waiting for category...')
+label_question2.grid(row=5, column=0, pady=10)
+
+label_question3 = Label(root, text= 'Waiting for category...')
+label_question3.grid(row=6, column=0, pady=10)
+
+label_question4 = Label(root, text= 'Waiting for category...')
+label_question4.grid(row=7, column=0, pady=10)
+
+label_question5 = Label(root, text= 'Waiting for category...')
+label_question5.grid(row=8, column=0, pady=10)
+
+answer1_field = Entry(root)
+answer1_field.grid(row=4, column=2, padx=10, pady=10)
+
+answer2_field = Entry(root)
+answer2_field.grid(row=5, column=2, padx=10, pady=10)
+
+answer3_field = Entry(root)
+answer3_field.grid(row=6, column=2, padx=10, pady=10)
+
+answer4_field = Entry(root)
+answer4_field.grid(row=7, column=2, padx=10, pady=10)
+
+answer5_field = Entry(root)
+answer5_field.grid(row=8, column=2, padx=10, pady=10)
+
+button_check_answers= Button(root, text='Check answers', bg='red', fg='black', command=check_answers)
+button_check_answers.grid(row=9, column=1, padx=10, pady=10 )
+
+button_show_correct_answers= Button(root, text='Show all correct answers', bg='red', fg='black', command=show_correct_answers)
+button_show_correct_answers.grid(row=10, column=0, padx=10, pady=10 )
+
+button_clear_all= Button(root, text='Reset all', bg='red', fg='black', command=clear_all)
+button_clear_all.grid(row=10, column=2, padx=10, pady=10 )
+
+root.mainloop()
+# # Asks the user how many questions he wants between 5 and max = len of the category chosen.
+# # Then randomize which words are taken
+#
+# max_questions = len(category_chosen)
+# number_questions = input(f'How many questions do you want between 5 and {max_questions}?: ')
+# number_questions = int(number_questions)
+# questions = random.sample(list(result.items()), k=number_questions)
+#
+# num_correct = 0  # Correct answer counter
+# for num, (question, correct_answer) in enumerate(questions, start=1):
+#     print(f"\n Question {num}:")
+#     answer = input(f" What is the translation of {question} : ")
+#     if answer == correct_answer or answer.lower() == correct_answer or answer.title() == correct_answer:
+#         num_correct += 1
+#         print('\n ⭐ Correct! ⭐')
+#     # Sometimes 2 or more translations are given, separated by a comma
+#     elif answer in correct_answer and (',' in correct_answer):
+#         num_correct += 1
+#         print('\n ⭐ Correct! ⭐')
+#     else:
+#         print(f" No the answer was {correct_answer!r}!")
+#
+# print(f"\n Your score is {num_correct} out of {num}! ")
