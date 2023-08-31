@@ -1,7 +1,9 @@
 # QuizGUI
 
-Branch for the development of GUI version of the quiz using tkinter (scrap version)
+Branch for the development of GUI version of the quiz using tkinter (master version and scrap version)
 
-Work in progress, basicQuizGUI working. 
+basicQuizGUI working. 
 
+quizGUI working (master version)
 
+Work in progress...
