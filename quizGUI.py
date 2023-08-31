@@ -31,7 +31,7 @@ def define_vocab_list():
             vocab_chosen_cleaned = [x for x in vocab_chosen if str(x) != 'nan']
             vocab_chosen_translated_cleaned = [x for x in vocab_chosen_translated if str(x) != 'nan']
 
-        if category_chosen in category_en:
+        else:
             vocab_chosen = df[category_chosen].tolist()
             category_chosen_translated = category_chosen.replace('En', 'Fi')
             vocab_chosen_translated = df[category_chosen_translated].tolist()
