@@ -15,7 +15,6 @@ category_fi = categories[::2]
 category_en = categories[1::2]
 
 
-
 def define_vocab_list():
     category_chosen = user_category_field.get()
     category_chosen = category_chosen.title()
@@ -73,6 +72,7 @@ def check_answers():
             pass
     button_check_answers.config(text='Your score is ' + str(num_correct) + '/5!')
 
+
 def show_correct_answers():
     text = f'The correct answers are:\nQuestion1: {correct_answers[0]} | Question2: {correct_answers[1]}  \n' \
            f'Question3: {correct_answers[2]} | Question4: {correct_answers[3]} \n Question5: {correct_answers[4]} '
@@ -96,8 +96,6 @@ def clear_all():
     label_question5.config(text='Waiting for category...')
 
 
-
-
 # Create a GUI Window
 root = Tk()
 
@@ -107,33 +105,32 @@ root.geometry("1500x600")
 # set the title of the Window
 root.title("Quiz")
 
-str_categories='CATEGORIES: ' + ' | '.join(categories)
+str_categories = 'CATEGORIES: ' + ' | '.join(categories)
 label_categories = Label(root, text=str_categories, fg='red')
 label_categories.grid(row=1, column=1, padx=10, pady=10)
 
-
 label_user_category = Label(root, text='Please choose a chapter among the ones proposed above: ', fg='black')
-label_user_category.grid(row=2, column=0, padx=10, pady= 10)
+label_user_category.grid(row=2, column=0, padx=10, pady=10)
 
 user_category_field = Entry(root)
 user_category_field.grid(row=2, column=2, padx=10, pady=10)
 
 button_confirm_category = Button(root, text='Confirm category', bg='red', fg='black', command=define_vocab_list)
-button_confirm_category.grid(row=3, column=1, padx=10, pady=10 )
+button_confirm_category.grid(row=3, column=1, padx=10, pady=10)
 
-label_question1 = Label(root, text= 'Waiting for category...')
+label_question1 = Label(root, text='Waiting for category...')
 label_question1.grid(row=4, column=0, pady=10)
 
-label_question2 = Label(root, text= 'Waiting for category...')
+label_question2 = Label(root, text='Waiting for category...')
 label_question2.grid(row=5, column=0, pady=10)
 
-label_question3 = Label(root, text= 'Waiting for category...')
+label_question3 = Label(root, text='Waiting for category...')
 label_question3.grid(row=6, column=0, pady=10)
 
-label_question4 = Label(root, text= 'Waiting for category...')
+label_question4 = Label(root, text='Waiting for category...')
 label_question4.grid(row=7, column=0, pady=10)
 
-label_question5 = Label(root, text= 'Waiting for category...')
+label_question5 = Label(root, text='Waiting for category...')
 label_question5.grid(row=8, column=0, pady=10)
 
 answer1_field = Entry(root)
@@ -151,13 +148,14 @@ answer4_field.grid(row=7, column=2, padx=10, pady=10)
 answer5_field = Entry(root)
 answer5_field.grid(row=8, column=2, padx=10, pady=10)
 
-button_check_answers= Button(root, text='Check answers', bg='red', fg='black', command=check_answers)
-button_check_answers.grid(row=9, column=1, padx=10, pady=10 )
+button_check_answers = Button(root, text='Check answers', bg='red', fg='black', command=check_answers)
+button_check_answers.grid(row=9, column=1, padx=10, pady=10)
 
-button_show_correct_answers= Button(root, text='Show all correct answers', bg='red', fg='black', command=show_correct_answers)
-button_show_correct_answers.grid(row=10, column=0, padx=10, pady=10 )
+button_show_correct_answers = Button(root, text='Show all correct answers', bg='red', fg='black',
+                                     command=show_correct_answers)
+button_show_correct_answers.grid(row=10, column=0, padx=10, pady=10)
 
-button_clear_all= Button(root, text='Reset all', bg='red', fg='black', command=clear_all)
-button_clear_all.grid(row=10, column=2, padx=10, pady=10 )
+button_clear_all = Button(root, text='Reset all', bg='red', fg='black', command=clear_all)
+button_clear_all.grid(row=10, column=2, padx=10, pady=10)
 
 root.mainloop()
