@@ -161,26 +161,3 @@ button_clear_all= Button(root, text='Reset all', bg='red', fg='black', command=c
 button_clear_all.grid(row=10, column=2, padx=10, pady=10 )
 
 root.mainloop()
-# # Asks the user how many questions he wants between 5 and max = len of the category chosen.
-# # Then randomize which words are taken
-#
-# max_questions = len(category_chosen)
-# number_questions = input(f'How many questions do you want between 5 and {max_questions}?: ')
-# number_questions = int(number_questions)
-# questions = random.sample(list(result.items()), k=number_questions)
-#
-# num_correct = 0  # Correct answer counter
-# for num, (question, correct_answer) in enumerate(questions, start=1):
-#     print(f"\n Question {num}:")
-#     answer = input(f" What is the translation of {question} : ")
-#     if answer == correct_answer or answer.lower() == correct_answer or answer.title() == correct_answer:
-#         num_correct += 1
-#         print('\n ⭐ Correct! ⭐')
-#     # Sometimes 2 or more translations are given, separated by a comma
-#     elif answer in correct_answer and (',' in correct_answer):
-#         num_correct += 1
-#         print('\n ⭐ Correct! ⭐')
-#     else:
-#         print(f" No the answer was {correct_answer!r}!")
-#
-# print(f"\n Your score is {num_correct} out of {num}! ")
