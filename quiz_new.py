@@ -1,112 +1,64 @@
 import pandas as pd
-import random
 import sys
 
-#in csv file, column 3n = finnish,3n+1 = english, 3n+2=sentence example with the finnish word. n index of column start from 0. 
+#in csv file, with n=index of column (start from 0) column 3n = finnish, 3n+1 = english, 3n+2=sentence example with the finnish word. 
 
 # read csv file with datas
 df = pd.read_csv('Vocab kappale copy.csv')
 
-# Define chapters name (columns), every three columns is a chapter 
+# Define chapters name list (headers), every three columns is a chapter name
 chapters = (list(df))[::3]
 
+# Ask user what chapter.  loop if answer not within choices
+print("Chapters: ")
+print("\n".join(["  |   ".join(chapters[i:i + 3]) for i in range(0, len(chapters), 3)])) # make it so that 3 chapters are printer per line
+chapter_chosen_index = int(input("\nWhat chapter do you choose?(Enter the chapter number) : "))
+while chapter_chosen_index not in range(1,len(chapters)+1):
+    chapter_chosen_index = int(input(f"\nPlease select 1 to {len(chapters)}: "))
+#index start at 0 in list
+chapter_chosen_index = chapter_chosen_index-1
+chapter_chosen = chapters[chapter_chosen_index]
+print(f"\nYou chose {chapter_chosen}!")
 
-#----------------------------------------------------------------------
-#old version
-"""
-# Ask user what category. #Todo loop if answer incorrect (not one of the categories)
-while True:
-    print("Chapters: ")
-    print("\n".join(["  |   ".join(chapters[i:i + 3]) for i in range(0, len(chapters), 3)]))
-    chapter_chosen_index = int(input("\nWhat chapter do you choose?(Enter the corresponding number) : "))
-    #index start at 0 in list
-    chapter_chosen_index = chapter_chosen_index-1
-    # english index column will be 3 times+1the index chosen in chapters (english is every 3 other columns+1)    
-    english_column_index = 3 * chapter_chosen_index +1
-    # example of the finnish word used in a sentence #Todo later
-    #example_column_index = 3 * chapter_chosen_index + 2
-    #examples = (df.iloc[:,example_column_index]).tolist()
-    #examples = [x for x in examples if str(x) != 'nan']
-    chapter_chosen = chapters[chapter_chosen_index]
-    print(f"\nYou chose {chapter_chosen}!")
-    break
 
-#Ask Fin->eng or eng-fin
- language_selected = int(input("\nDo you want to play Finnish->English(1) or English->Finnish(2)?: "))
-if language_selected==1:
-    # questions will start from finnish, so 3n columns which is also chapters name
-    questions = df[chapter_chosen].tolist()
-    correct_answer = (df.iloc[:,english_column_index]).tolist()
-elif language_selected==2:
-    correct_answer = df[chapter_chosen].tolist()
-    # this time question index column is 3+1
-    questions = (df.iloc[:,english_column_index]).tolist()
-
-# Remove the nan from the empty csv cells
-questions = [x for x in questions if str(x) != 'nan']
-correct_answer = [x for x in correct_answer if str(x) != 'nan']
-
-# Description mode
-# result = dict(zip(questions, correct_answer, examples))
-# Create dict of questions and answers (easy to shuffle together for quiz)
-#result = dict(zip(questions, correct_answer))
-
-# Set number questions according to user and randomize which words are taken
-#n_question = int(input(f"How many questions? (5 to {len(questions)}): "))
-#questions = random.sample(list(result.items()), k=n_question)
-
-num_correct = 0  # Correct answer counter
-for num, (question, correct_answer, example) in enumerate(questions, start=1):
-    print(f"\n Question {num}:")
-    answer = input(f" What is the translation of {question} : ")
-    # lower method to ignore case sensitivity
-    if answer.lower() == correct_answer.lower():
-        num_correct += 1
-        print('\n ⭐ Correct! ⭐')
-    # case when there are several translations
-    elif answer in correct_answer.split(','):
-        num_correct += 1
-        print('\n ⭐ Correct! ⭐')
-    else:
-        print(f" No the answer was {correct_answer!r}!")
-    print(f"An example of use is: {example}")
-
-print(f"\n Your score is {num_correct} out of {num}! ") """
-
-#----------------------------------------------------------------------------------------
-#NEW
-
-# Ask user what category. #Todo loop if answer incorrect (not one of the categories)
-while True:
-    print("Chapters: ")
-    print("\n".join(["  |   ".join(chapters[i:i + 3]) for i in range(0, len(chapters), 3)]))
-    chapter_chosen_index = int(input("\nWhat chapter do you choose?(Enter the corresponding number) : "))
-    #index start at 0 in list
-    chapter_chosen_index = chapter_chosen_index-1
-    chapter_chosen = chapters[chapter_chosen_index]
-    print(f"\nYou chose {chapter_chosen}!")
-    break
-
-# eliminate rows where all values are nan (how=all)
+# take the 3 corresponding columns and eliminate rows where all values are nan (how=all)
 df = df[df.columns[3*chapter_chosen_index:3*chapter_chosen_index+3]].dropna(how='all')
-# replace nan values from the description column by "no description" in case there are none
+# replace nan values from the description column by "no description available" in case there is none
 df.fillna('No description available', inplace=True)
 df.columns = ['Finnish', 'English', 'Example']
+
+# ask user how many questions, shuffle the series together and reset the index to be clean for quiz loop
 n_question = int(input(f"How many questions? (5 to {df.shape[0]}): "))
-A = df.sample(n_question)
-#A.reset_index()
-A.reset_index(drop=True, inplace=True)
-print(A)
-for i in range(0, df.shape[0]):
-    word_question = A.at[i,'Finnish']
-    correct_answer = A.at[i,'English']
-    example = A.at[i,'Example']
-    answer = input(f'\nWhat is the translation of {word_question}?: ')
+chapter_df = df.sample(n_question)
+chapter_df.reset_index(drop=True, inplace=True)
+
+#Ask Fin->eng or eng-fin and make list of questions/correct answers accordingly
+language_selected = int(input("\nDo you want to play Finnish->English(1) or English->Finnish(2)?: "))
+while language_selected!=1 and language_selected!=2:
+    language_selected = int(input("Please select 1 or 2 only: "))
+if language_selected==1:
+    questions = chapter_df['Finnish'].tolist()
+    correct_answers = chapter_df['English'].tolist()
+elif language_selected==2:
+    questions = chapter_df['English'].tolist()
+    correct_answers = chapter_df['Finnish'].tolist()
+examples = chapter_df['Example'].tolist()
+
+num_correct = 0  # Correct answer counter
+for num, (question, correct_answer, example) in enumerate(zip(questions, correct_answers, examples), start =1):
+    print(f"\n Question {num}:")
+    answer = input(f"\nWhat is the translation of '{question}'?: ")
     if answer.lower() == correct_answer.lower():
+        num_correct += 1
         print('\n ⭐ Correct! ⭐')
+    # case when there are several translations separated by a coma. will accept any of the answers 
     elif answer in correct_answer.split(','):
+        num_correct += 1
         print('\n ⭐ Correct! ⭐')
     else:
-        print(f"\nNo the answer was {correct_answer}!")
+        print(f"\nNo the answer was: '{correct_answer}'!")
+    # give the description if there is one
     if example!='No description available':
-        print(f"An example of use is: {example}")
+        print(f"An example of use is: {example}") 
+
+print(f"\nYour score is {num_correct} out of {num}! ")
