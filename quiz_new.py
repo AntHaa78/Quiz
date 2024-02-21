@@ -4,14 +4,14 @@ import sys
 #in csv file, with n=index of column (start from 0) column 3n = finnish, 3n+1 = english, 3n+2=sentence example with the finnish word. 
 
 # read csv file with datas
-df = pd.read_csv('Vocab kappale copy.csv')
+df = pd.read_csv('Vocab kappale.csv')
 
 # Define chapters name list (headers), every three columns is a chapter name
 chapters = (list(df))[::3]
 
 # Ask user what chapter.  loop if answer not within choices
 print("Chapters: ")
-print("\n".join(["  |   ".join(chapters[i:i + 3]) for i in range(0, len(chapters), 3)])) # make it so that 3 chapters are printed per line
+print("\n".join(["  |   ".join(chapters[i:i + 2]) for i in range(0, len(chapters), 2)])) # make it so that 2 chapters are printed per line
 chapter_chosen_index = int(input("\nWhat chapter do you choose?(Enter the chapter number) : "))
 while chapter_chosen_index not in range(1,len(chapters)+1):
     chapter_chosen_index = int(input(f"\nPlease select 1 to {len(chapters)}: "))
@@ -28,7 +28,7 @@ df.fillna('No description available', inplace=True)
 df.columns = ['Finnish', 'English', 'Example']
 
 # ask user how many questions, shuffle the series together and reset the index to be clean for quiz loop
-n_question = int(input(f"How many questions? (5 to {df.shape[0]}): "))
+n_question = int(input(f"\nHow many questions? (5 to {df.shape[0]}): "))
 chapter_df = df.sample(n_question)
 chapter_df.reset_index(drop=True, inplace=True)
 
