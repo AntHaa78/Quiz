@@ -11,7 +11,7 @@ chapters = (list(df))[::3]
 
 # Ask user what chapter.  loop if answer not within choices
 print("Chapters: ")
-print("\n".join(["  |   ".join(chapters[i:i + 3]) for i in range(0, len(chapters), 3)])) # make it so that 3 chapters are printer per line
+print("\n".join(["  |   ".join(chapters[i:i + 3]) for i in range(0, len(chapters), 3)])) # make it so that 3 chapters are printed per line
 chapter_chosen_index = int(input("\nWhat chapter do you choose?(Enter the chapter number) : "))
 while chapter_chosen_index not in range(1,len(chapters)+1):
     chapter_chosen_index = int(input(f"\nPlease select 1 to {len(chapters)}: "))
@@ -59,6 +59,12 @@ for num, (question, correct_answer, example) in enumerate(zip(questions, correct
         print(f"\nNo the answer was: '{correct_answer}'!")
     # give the description if there is one
     if example!='No description available':
-        print(f"An example of use is: {example}") 
+        print(f"An example of use is: {example}.") 
 
-print(f"\nYour score is {num_correct} out of {num}! ")
+print(f"\n⭐⭐⭐ Your score is {num_correct} out of {num}! ⭐⭐⭐")
+if (num_correct/num)>=0.9:
+    print("\nExcellent!")
+elif (num_correct/num)<0.9 and (num_correct/num)>=0.7:
+    print("\nNot bad! Keep studying")
+else :
+    print("\nYou need to study more!!")
