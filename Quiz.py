@@ -105,4 +105,4 @@ leaderboard_display = input("Do you want to see the leaderboard?: ")
 if leaderboard_display=='y':
     columns = ['Player name', 'chapter', 'direction', 'today','score %']
     df_leaderboard=pd.read_csv('leaderboard.csv', names=columns, encoding='latin-1')
-    print(df_leaderboard.sort_values(by=['score %']))
+    print(df_leaderboard.sort_values(by=['score %'],ascending=False))
