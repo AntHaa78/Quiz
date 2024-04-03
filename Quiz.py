@@ -24,7 +24,7 @@ def print_example(string):
 ranked = input("Do you want to play for leaderboard?(y/n): ")
 if ranked == 'y':
     player_name = input("What is your name?: ")
-    today = date.today()
+    day_played = date.today()
 
 # read csv file with datas
 df = pd.read_csv('Vocab kappale.csv')
@@ -103,10 +103,10 @@ else:
 if ranked == 'y':
     with open('leaderboard.csv', 'a', newline='') as file:
         writer = csv.writer(file)
-        writer.writerow([player_name, chapter_chosen, direction, today, score])
+        writer.writerow([player_name, chapter_chosen, direction, day_played, score])
 
 leaderboard_display = input("Do you want to see the leaderboard?: ")
 if leaderboard_display == 'y':
-    columns = ['Player name', 'chapter', 'direction', 'today', 'score %']
+    columns = ['Player name', 'chapter', 'direction', 'date', 'score %']
     df_leaderboard = pd.read_csv('leaderboard.csv', names=columns, encoding='latin-1')
     print(df_leaderboard.sort_values(by=['score %'], ascending=False))
