@@ -9,7 +9,8 @@ from datetime import date
 # in csv file, with n=index of column (start from 0) column 3n = finnish, 3n+1 = english, 3n+2=sentence example with
 # the finnish word.
 
-# function to print the example/description of word, to make distinction between french text and finnish sentences
+# function to print the example/description of word, to make distinction between french text and finnish sentences. 
+# French description are between parenthesis
 def print_example(string):
     if '(' in string or ')' in string:
         french_text = string[string.index('(') + 1: string.index(')')]
