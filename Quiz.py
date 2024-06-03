@@ -2,6 +2,7 @@ import pandas as pd
 import sys
 import csv
 from datetime import date
+from tabulate import tabulate
 
 
 # thingstodo add more leaderboard options. make functions. add comments
@@ -21,11 +22,19 @@ def print_example(string):
     elif string != 'No description available':
         print(f"\nAn example of use is: {string}.")
 
+# ask if play or just read
+play_or_read = input("Do you want to play or read?(p/r): ")
+while play_or_read != 'p' and play_or_read!='r':
+    print("Please enter 'p' or 'r' only: ")
+    play_or_read = input("Do you want to play or read?(p/r): ")
+#ask if "competitive" mode, if yes leaderboard will be updated
+if play_or_read == 'p':
+    ranked = input("Do you want to play for leaderboard?(y/n): ")
+    if ranked == 'y':
+        player_name = input("What is your name?: ")
+        day_played = date.today()
 
-ranked = input("Do you want to play for leaderboard?(y/n): ")
-if ranked == 'y':
-    player_name = input("What is your name?: ")
-    day_played = date.today()
+
 
 # read csv file with datas
 df = pd.read_csv('Vocab kappale.csv')
@@ -49,7 +58,15 @@ print(f"\nYou chose {chapter_chosen}!")
 df = df[df.columns[3 * chapter_chosen_index:3 * chapter_chosen_index + 3]].dropna(how='all')
 # replace nan values from the description column by "no description available" in case there is none
 df.fillna('No description available', inplace=True)
-df.columns = ['Finnish', 'English', 'Example']
+df.columns = ['Finnish', 'English', 'Example/Description']
+
+# show user chosen vocab if just want to read
+if play_or_read == 'r':
+    print("\nHere is the vocabulary, happy learning!\n")
+    #print(df.to_string())
+    print(tabulate(df, headers = 'keys', tablefmt = 'fancy_grid', showindex=False))
+    
+    sys.exit(0)
 
 # ask user how many questions, shuffle the series together and reset the index to be clean for quiz loop. If ranked
 # 20 questions
@@ -73,13 +90,13 @@ elif language_selected == '2':
     questions = chapter_df['English'].tolist()
     correct_answers = chapter_df['Finnish'].tolist()
     direction = 'Eng->Fin'
-examples = chapter_df['Example'].tolist()
+examples = chapter_df['Example/Description'].tolist()
 
 num_correct = 0  # Correct answer counter
 for num, (question, correct_answer, example) in enumerate(zip(questions, correct_answers, examples), start=1):
     print(f"\n Question {num}:")
     answer = input(f"\nWhat is the translation of '{question}'?: ")
-    if answer.lower() == correct_answer.lower():
+    if answer.lower() == correct_answer.lower() or answer.lower() in (correct_answer.lower()).split('+'):
         num_correct += 1
         print('\n ⭐ Correct! ⭐')
     # case when there are several translations separated by a coma. will accept any of the answers 
