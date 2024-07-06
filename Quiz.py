@@ -3,7 +3,7 @@ import sys
 import csv
 from datetime import date
 from tabulate import tabulate
-
+import random
 
 # thingstodo add more leaderboard options. make functions. add comments
 
@@ -22,17 +22,23 @@ def print_example(string):
     elif string != 'No description available':
         print(f"\nAn example of use is: {string}.")
 
-# ask if play or just read
-play_or_read = input("Do you want to play or read?(p/r): ")
+# ask if play or just read. if read normal_or_random is set to normal to be able to choose what category to read
+play_or_read = input("\nDo you want to play or read vocabulary?(p/r): ")
 while play_or_read != 'p' and play_or_read!='r':
     print("Please enter 'p' or 'r' only: ")
-    play_or_read = input("Do you want to play or read?(p/r): ")
-#ask if "competitive" mode, if yes leaderboard will be updated
+    play_or_read = input("\nDo you want to play or read?(p/r): ")
+#ask if normal, random, then if normal competitive or random competitive. if competitive respective leaderboard will be updated. 
 if play_or_read == 'p':
-    ranked = input("Do you want to play for leaderboard?(y/n): ")
+    normal_or_random = input("\nDo you want to play regular or random mode?\nIn regular you choose the category, in random a random category is chosen for you\nEnter 'reg' or 'rand': ")
+    while normal_or_random != 'reg' and normal_or_random!='rand':
+        print("Please enter 'reg' or 'rand' only: ")
+        normal_or_random = input("\nDo you want to play regular or random mode??(reg/rand): ")
+    ranked = input("\nDo you want to play for leaderboard?(y/n): ")
     if ranked == 'y':
         player_name = input("What is your name?: ")
         day_played = date.today()
+if play_or_read == 'r':
+    normal_or_random = 'reg'
 
 
 
@@ -42,17 +48,23 @@ df = pd.read_csv('Vocab kappale.csv')
 # Define chapters name list (headers), every three columns is a chapter name
 chapters = (list(df))[::3]
 
-# Ask user what chapter.  loop if answer not within choices
-print("\nChapters: ")
-print("\n".join(["  |   ".join(chapters[i:i + 2]) for i in
-                 range(0, len(chapters), 2)]))  # make it so that 2 chapters are printed per line
-chapter_chosen_index = int(input("\nWhat chapter do you choose?(Enter the chapter number) : "))
-while chapter_chosen_index not in range(1, len(chapters) + 1):
-    chapter_chosen_index = int(input(f"\nPlease select 1 to {len(chapters)}: "))
-# index start at 0 in list
-chapter_chosen_index = chapter_chosen_index - 1
-chapter_chosen = chapters[chapter_chosen_index]
-print(f"\nYou chose {chapter_chosen}!")
+# Ask user what chapter if regular mode, or select a random chapter if random mode.
+if normal_or_random == 'reg':
+    print("\nChapters: ")
+    print("\n".join(["  |   ".join(chapters[i:i + 2]) for i in
+                    range(0, len(chapters), 2)]))  # make it so that 2 chapters are printed per line
+    chapter_chosen_index = int(input("\nWhat chapter do you choose?(Enter the chapter number) : "))
+    while chapter_chosen_index not in range(1, len(chapters) + 1):
+        chapter_chosen_index = int(input(f"\nPlease select 1 to {len(chapters)}: "))
+    # index start at 0 in list
+    chapter_chosen_index = chapter_chosen_index - 1
+    chapter_chosen = chapters[chapter_chosen_index]
+    print(f"\nYou chose {chapter_chosen}!")
+if normal_or_random == 'rand':
+    random_chapter_index = random.randint(0, len(chapters)-1)
+    chapter_chosen_index = random_chapter_index
+    chapter_chosen = chapters[chapter_chosen_index]
+    print(f"\nThe following chapter was chosen!\n{chapter_chosen}")
 
 # take the 3 corresponding columns and eliminate rows where all values are nan (how=all)
 df = df[df.columns[3 * chapter_chosen_index:3 * chapter_chosen_index + 3]].dropna(how='all')
@@ -66,6 +78,7 @@ if play_or_read == 'r':
     #print(df.to_string())
     print(tabulate(df, headers = 'keys', tablefmt = 'fancy_grid', showindex=False))
     
+    # Change logic to incorporate loop if want to read more chapters
     sys.exit(0)
 
 # ask user how many questions, shuffle the series together and reset the index to be clean for quiz loop. If ranked
@@ -118,13 +131,24 @@ elif 90 > score >= 70:
 else:
     print("\nYou need to study more!!")
 
+# write results if ranked
 if ranked == 'y':
-    with open('leaderboard.csv', 'a', newline='') as file:
-        writer = csv.writer(file)
-        writer.writerow([player_name, chapter_chosen, direction, day_played, score])
+    if normal_or_random == 'reg':
+        with open('leaderboard_reg.csv', 'a', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow([player_name, chapter_chosen, direction, day_played, score])
+    if normal_or_random == 'rand':
+        with open('leaderboard_rand.csv', 'a', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow([player_name, chapter_chosen, direction, day_played, score])
 
-leaderboard_display = input("Do you want to see the leaderboard?: ")
+# leaderboard check
+leaderboard_display = input("Do you want to see the respective leaderboard?: ")
 if leaderboard_display == 'y':
     columns = ['Player name', 'chapter', 'direction', 'date', 'score %']
-    df_leaderboard = pd.read_csv('leaderboard.csv', names=columns, encoding='latin-1')
-    print(df_leaderboard.sort_values(by=['score %'], ascending=False))
+    if normal_or_random == 'reg':
+        df_leaderboard = pd.read_csv('leaderboard_reg.csv', names=columns, encoding='latin-1')
+        print(df_leaderboard.sort_values(by=['score %'], ascending=False))
+    if normal_or_random == 'rand':
+        df_leaderboard = pd.read_csv('leaderboard_rand.csv', names=columns, encoding='latin-1')
+        print(df_leaderboard.sort_values(by=['score %'], ascending=False))
