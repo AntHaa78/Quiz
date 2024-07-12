@@ -84,15 +84,9 @@ def select_data(mode_chosen):
 
     if mode_chosen == 'read':
         print("\nHere is the vocabulary, happy learning!\n")
-        print(tabulate(df, headers = 'keys', tablefmt = 'fancy_grid', showindex=False))
-
-        continue_or_not = input("Do you want to continue or stop?(cont/stop) ")
-        while continue_or_not != 'cont' and continue_or_not!='stop':
-            print("Please enter 'cont' or 'stop' only: ")
-            continue_or_not = input("\nDo you want to continue or stop?(cont/stop) ")
-        sys.exit(0)
-        #exit for now, later find way to play again
-    
+        print(tabulate(df, headers = 'keys', tablefmt = 'fancy_grid', showindex=False)) 
+        return 0
+        
 
     if mode_chosen == 'non_random-non_ranked' or mode_chosen == 'random-non_ranked':
         n_question = int(input(f"\nHow many questions? (5 to {df.shape[0]}): "))
@@ -100,6 +94,7 @@ def select_data(mode_chosen):
     chapter_df = df.sample(n_question)
     chapter_df.reset_index(drop=True, inplace=True)
 
+ 
     language_selected = input("\nDo you want to play Finnish->English(1) or English->Finnish(2)?: ")
     while language_selected != '1' and language_selected != '2':
         language_selected = input("Please select 1 or 2 only: ")
@@ -171,25 +166,37 @@ def leaderboard_check(mode_chosen):
         #df_leaderboard.style.hide(axis="index")
         print(df_leaderboard.sort_values(by=['score %'], ascending=False))
 
+def play_or_not():
+    answer = input("\nDo you want to play/read again(y/n)? ")
+    if answer == 'y':
+        return 1
+    else:
+        return 0
+
 
 if __name__ == '__main__':
+    play_again = 1
+    while play_again == 1:
 
-    mode_chosen, player_name, day_played = mode()
-    
-    if mode_chosen == 'read':
-        select_data(mode_chosen)
-    else:
-        questions, correct_answers, examples, direction, chapter_chosen = select_data(mode_chosen)
+        mode_chosen, player_name, day_played = mode()
+        
+        if mode_chosen == 'read':
+            select_data(mode_chosen)
 
-    num_correct, num = quiz_game(questions, correct_answers, examples)
+        else:
+            questions, correct_answers, examples, direction, chapter_chosen = select_data(mode_chosen)
 
-    score = score_player(num_correct, num)
+            num_correct, num = quiz_game(questions, correct_answers, examples)
 
-    if mode_chosen == 'random-ranked' or mode_chosen == 'non_random-ranked':
-        leaderboard_update(player_name, chapter_chosen, direction, day_played, score, mode_chosen)
-        check_leaderboard = input("Do you want to see the respective leaderboard?: ")
-        if check_leaderboard == 'y':
-            leaderboard_check(mode_chosen)
+            score = score_player(num_correct, num)
+
+            if mode_chosen == 'random-ranked' or mode_chosen == 'non_random-ranked':
+                leaderboard_update(player_name, chapter_chosen, direction, day_played, score, mode_chosen)
+                check_leaderboard = input("Do you want to see the respective leaderboard?: ")
+                if check_leaderboard == 'y':
+                    leaderboard_check(mode_chosen)
+        
+        play_again = play_or_not()
 
     #Define MODE ->
     #PLAY OR READ, if PLAY reg or rand, leaderboard or not,fi to eng or eng to fi
